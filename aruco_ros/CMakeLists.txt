@@ -49,6 +49,11 @@ add_executable(double src/simple_double.cpp
 add_dependencies(double ${PROJECT_NAME}_gencfg)
 target_link_libraries(double ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
+add_executable(grips_aruco src/grips_aruco.cpp
+                      src/aruco_ros_utils.cpp)
+add_dependencies(grips_aruco ${PROJECT_NAME}_gencfg)
+target_link_libraries(grips_aruco ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
 add_executable(marker_publisher src/marker_publish.cpp
                                 src/aruco_ros_utils.cpp)
 add_dependencies(marker_publisher ${PROJECT_NAME}_gencfg)
@@ -58,7 +63,7 @@ target_link_libraries(marker_publisher ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 ## Install ##
 #############
 
-install(TARGETS single double marker_publisher aruco_ros_utils
+install(TARGETS single double marker_publisher grips_aruco aruco_ros_utils
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
