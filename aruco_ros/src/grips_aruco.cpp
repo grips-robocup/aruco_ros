@@ -216,9 +216,17 @@ public:
             
           br.sendTransform(stampedTransform);
           geometry_msgs::PoseStamped poseMsg;
+
+          tf::Quaternion quat = transform.getRotation();
+          double roll, pitch, yaw;
+          tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
+          quat.setRPY(0.f, 0.f, yaw);
+          transform.setRotation(quat);
+
           tf::poseTFToMsg(transform, poseMsg.pose);
           poseMsg.header.frame_id = reference_frame;
           poseMsg.header.stamp = curr_stamp;
+
           pose_pub.publish(poseMsg);
 
           geometry_msgs::TransformStamped transformMsg;
