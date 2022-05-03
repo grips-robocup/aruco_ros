@@ -196,7 +196,18 @@ public:
           {
             aruco_msgs::Marker & marker_i = marker_msg_->markers.at(i);
             tf::Transform transform = aruco_ros::arucoMarker2Tf(markers_[i]);
+            
+            //quickfix for aachen - fix wobbeling 
+            tf::Quaternion quat = transform.getRotation();
+            double roll, pitch, yaw;
+            tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
+            tf::Quaternion new_quat;
+            new_quat.setRPY(3.1415f, 0.f, yaw);
+            
+            transform.setRotation(new_quat);
+
             transform = static_cast<tf::Transform>(cameraToReference) * transform;
+
             tf::poseTFToMsg(transform, marker_i.pose.pose);
             marker_i.header.frame_id = reference_frame_;
           }

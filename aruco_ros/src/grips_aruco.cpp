@@ -203,6 +203,15 @@ public:
           tf::StampedTransform cameraToReference;
           cameraToReference.setIdentity();
 
+          //quickfix for aachen - fix wobbeling
+          tf::Quaternion quat = transform.getRotation();
+          double roll, pitch, yaw;
+          tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
+          tf::Quaternion new_quat;
+          new_quat.setRPY(3.1415f, 0.f, yaw);
+          
+          transform.setRotation(new_quat);
+
           if (reference_frame != camera_frame)
           {
             getTransform(reference_frame, camera_frame, cameraToReference);
@@ -217,11 +226,6 @@ public:
           br.sendTransform(stampedTransform);
           geometry_msgs::PoseStamped poseMsg;
 
-          tf::Quaternion quat = transform.getRotation();
-          double roll, pitch, yaw;
-          tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
-          quat.setRPY(0.f, 0.f, yaw);
-          transform.setRotation(quat);
 
           tf::poseTFToMsg(transform, poseMsg.pose);
           poseMsg.header.frame_id = reference_frame;
