@@ -1,12 +1,13 @@
 <launch>
 
     <arg name="tf_prefix"       default="/grips1"/>
-    <arg name="markerId"        default="111"/>
+    <arg name="markerId"        default="111"/>   <!-- not needed anymore -->
     <arg name="markerSize"      default="0.13"/>    <!-- in m -->
-    <arg name="eye"             default="left"/>
-    <arg name="marker_frame"    default="marker"/> <!-- tf_prefix_/marker-->
+    <arg name="eye"             default="left"/>    <!-- not needed -->
+    <arg name="marker_frame"    default="/ar_marker"/> <!-- tf_prefix_marker_index -->
     <arg name="ref_frame"       default="/base_link"/>  <!-- leave empty and the pose will be published wrt param parent_name -->
     <arg name="corner_refinement" default="LINES" /> <!-- NONE, HARRIS, LINES, SUBPIX -->
+    <arg name="camera_frame"    default="/ar_cam_optical_frame" />
 
 
     <node pkg="aruco_ros" type="grips_aruco" name="grips_aruco_single">
@@ -16,7 +17,7 @@
         <param name="marker_size"        value="$(arg markerSize)"/>
         <param name="marker_id"          value="$(arg markerId)"/>
         <param name="reference_frame"    value="$(arg ref_frame)"/>   <!-- frame in which the marker pose will be refered -->
-        <param name="camera_frame"       value="ar_cam_optical_frame"/>
+        <param name="camera_frame"       value="$(arg camera_frame)"/>
         <param name="marker_frame"       value="$(arg marker_frame)" />
         <param name="corner_refinement"  value="$(arg corner_refinement)" />
         <param name="tf_prefix"          value="$(arg tf_prefix)" />

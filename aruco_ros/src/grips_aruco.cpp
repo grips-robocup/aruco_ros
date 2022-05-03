@@ -138,6 +138,7 @@ public:
     nh.param<bool>("image_is_rectified", useRectifiedImages, true);
     nh.param<std::string>("tf_prefix", tf_prefix, "");
     reference_frame = tf_prefix + reference_frame;
+    camera_frame = tf_prefix + camera_frame;
 
     ROS_ASSERT(camera_frame != "" && marker_frame != "");
 
@@ -180,15 +181,6 @@ public:
 
   void image_callback(const sensor_msgs::ImageConstPtr& msg)
   {
-    if ((image_pub.getNumSubscribers() == 0) && (debug_pub.getNumSubscribers() == 0)
-        && (pose_pub.getNumSubscribers() == 0) && (transform_pub.getNumSubscribers() == 0)
-        && (position_pub.getNumSubscribers() == 0) && (marker_pub.getNumSubscribers() == 0)
-        && (pixel_pub.getNumSubscribers() == 0))
-    {
-      ROS_DEBUG("No subscribers, not looking for ArUco markers");
-      return;
-    }
-
     static tf::TransformBroadcaster br;
     if (cam_info_received)
     {
@@ -206,66 +198,62 @@ public:
         // for each marker, draw info and its boundaries in the image
         for (std::size_t i = 0; i < markers.size(); ++i)
         {
-          // only publishing the selected marker
-          //if (markers[i].id == marker_id)
-          //{
-            tf::Transform transform = aruco_ros::arucoMarker2Tf(markers[i]);
-            tf::StampedTransform cameraToReference;
-            cameraToReference.setIdentity();
+          
+          tf::Transform transform = aruco_ros::arucoMarker2Tf(markers[i]);
+          tf::StampedTransform cameraToReference;
+          cameraToReference.setIdentity();
 
-            if (reference_frame != camera_frame)
-            {
-                getTransform(reference_frame, camera_frame, cameraToReference);
-            }
+          if (reference_frame != camera_frame)
+          {
+            getTransform(reference_frame, camera_frame, cameraToReference);
+          }
 
-            transform = static_cast<tf::Transform>(cameraToReference) * static_cast<tf::Transform>(rightToLeft)
-                * transform;
+          transform = static_cast<tf::Transform>(cameraToReference) * static_cast<tf::Transform>(rightToLeft)
+              * transform;
 
-            std::string grips_marker_frame = tf_prefix + "_" + marker_frame + "_" + std::to_string(markers[i].id);
-            tf::StampedTransform stampedTransform(transform, curr_stamp, reference_frame, grips_marker_frame);
+          std::string grips_marker_frame = tf_prefix + marker_frame + "_" + std::to_string(markers[i].id);
+          tf::StampedTransform stampedTransform(transform, curr_stamp, reference_frame, grips_marker_frame);
             
-            br.sendTransform(stampedTransform);
-            geometry_msgs::PoseStamped poseMsg;
-            tf::poseTFToMsg(transform, poseMsg.pose);
-            poseMsg.header.frame_id = reference_frame;
-            poseMsg.header.stamp = curr_stamp;
-            pose_pub.publish(poseMsg);
+          br.sendTransform(stampedTransform);
+          geometry_msgs::PoseStamped poseMsg;
+          tf::poseTFToMsg(transform, poseMsg.pose);
+          poseMsg.header.frame_id = reference_frame;
+          poseMsg.header.stamp = curr_stamp;
+          pose_pub.publish(poseMsg);
 
-            geometry_msgs::TransformStamped transformMsg;
-            tf::transformStampedTFToMsg(stampedTransform, transformMsg);
-            transform_pub.publish(transformMsg);
+          geometry_msgs::TransformStamped transformMsg;
+          tf::transformStampedTFToMsg(stampedTransform, transformMsg);
+          transform_pub.publish(transformMsg);
 
-            geometry_msgs::Vector3Stamped positionMsg;
-            positionMsg.header = transformMsg.header;
-            positionMsg.vector = transformMsg.transform.translation;
-            position_pub.publish(positionMsg);
+          geometry_msgs::Vector3Stamped positionMsg;
+          positionMsg.header = transformMsg.header;
+          positionMsg.vector = transformMsg.transform.translation;
+          position_pub.publish(positionMsg);
 
-            geometry_msgs::PointStamped pixelMsg;
-            pixelMsg.header = transformMsg.header;
-            pixelMsg.point.x = markers[i].getCenter().x;
-            pixelMsg.point.y = markers[i].getCenter().y;
-            pixelMsg.point.z = 0;
-            pixel_pub.publish(pixelMsg);
+          geometry_msgs::PointStamped pixelMsg;
+          pixelMsg.header = transformMsg.header;
+          pixelMsg.point.x = markers[i].getCenter().x;
+          pixelMsg.point.y = markers[i].getCenter().y;
+          pixelMsg.point.z = 0;
+          pixel_pub.publish(pixelMsg);
 
-            // publish rviz marker representing the ArUco marker patch
-            visualization_msgs::Marker visMarker;
-            visMarker.header = transformMsg.header;
-            visMarker.id = 1;
-            visMarker.type = visualization_msgs::Marker::CUBE;
-            visMarker.action = visualization_msgs::Marker::ADD;
-            visMarker.pose = poseMsg.pose;
-            visMarker.scale.x = marker_size;
-            visMarker.scale.y = marker_size;
-            visMarker.scale.z = 0.001;
-            visMarker.color.r = 1.0;
-            visMarker.color.g = 0;
-            visMarker.color.b = 0;
-            visMarker.color.a = 1.0;
-            visMarker.lifetime = ros::Duration(3.0);
-            marker_pub.publish(visMarker);
+          // publish rviz marker representing the ArUco marker patch
+          visualization_msgs::Marker visMarker;
+          visMarker.header = transformMsg.header;
+          visMarker.id = 1;
+          visMarker.type = visualization_msgs::Marker::CUBE;
+          visMarker.action = visualization_msgs::Marker::ADD;
+          visMarker.pose = poseMsg.pose;
+          visMarker.scale.x = marker_size;
+          visMarker.scale.y = marker_size;
+          visMarker.scale.z = 0.001;
+          visMarker.color.r = 1.0;
+          visMarker.color.g = 0;
+          visMarker.color.b = 0;
+          visMarker.color.a = 1.0;
+          visMarker.lifetime = ros::Duration(3.0);
+          marker_pub.publish(visMarker);
 
-          //}
-          // but drawing all the detected markers
           markers[i].draw(inImage, cv::Scalar(0, 0, 255), 2);
         }
 
