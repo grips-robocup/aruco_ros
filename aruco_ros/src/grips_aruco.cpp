@@ -63,6 +63,7 @@ private:
   std::string marker_frame;
   std::string camera_frame;
   std::string reference_frame;
+  std::string tf_prefix;
 
   double marker_size;
   int marker_id;
@@ -135,6 +136,8 @@ public:
     nh.param<std::string>("camera_frame", camera_frame, "");
     nh.param<std::string>("marker_frame", marker_frame, "");
     nh.param<bool>("image_is_rectified", useRectifiedImages, true);
+    nh.param<std::string>("tf_prefix", tf_prefix, "");
+    reference_frame = tf_prefix + reference_frame;
 
     ROS_ASSERT(camera_frame != "" && marker_frame != "");
 
@@ -210,17 +213,17 @@ public:
             tf::StampedTransform cameraToReference;
             cameraToReference.setIdentity();
 
-            std::string camera_frame_grips = camera_frame + "_" + std::to_string(markers[i].id);
-
-            if (reference_frame != camera_frame_grips)
+            if (reference_frame != camera_frame)
             {
-                getTransform(reference_frame, camera_frame_grips, cameraToReference);
+                getTransform(reference_frame, camera_frame, cameraToReference);
             }
 
             transform = static_cast<tf::Transform>(cameraToReference) * static_cast<tf::Transform>(rightToLeft)
                 * transform;
 
-            tf::StampedTransform stampedTransform(transform, curr_stamp, reference_frame, marker_frame);
+            std::string grips_marker_frame = tf_prefix + "_" + marker_frame + "_" + std::to_string(markers[i].id);
+            tf::StampedTransform stampedTransform(transform, curr_stamp, reference_frame, grips_marker_frame);
+            
             br.sendTransform(stampedTransform);
             geometry_msgs::PoseStamped poseMsg;
             tf::poseTFToMsg(transform, poseMsg.pose);
@@ -311,7 +314,7 @@ public:
     // handle cartesian offset between stereo pairs
     // see the sensor_msgs/CameraInfo documentation for details
     rightToLeft.setIdentity();
-    rightToLeft.setOrigin(tf::Vector3(-msg.P[3] / msg.P[0], -msg.P[7] / msg.P[5], 0.0));
+    //rightToLeft.setOrigin(tf::Vector3(-msg.P[3] / msg.P[0], -msg.P[7] / msg.P[5], 0.0));
 
     cam_info_received = true;
     cam_info_sub.shutdown();
