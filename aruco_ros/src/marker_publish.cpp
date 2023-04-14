@@ -61,6 +61,9 @@ private:
   std::string reference_frame_;
   double marker_size_;
 
+  // custom param
+  bool empty_published_;
+
   // ROS pub-sub
   ros::NodeHandle nh_;
   image_transport::ImageTransport it_;
@@ -111,6 +114,8 @@ public:
     marker_msg_ = aruco_msgs::MarkerArray::Ptr(new aruco_msgs::MarkerArray());
     marker_msg_->header.frame_id = reference_frame_;
     marker_msg_->header.seq = 0;
+
+    empty_published_ = false;
   }
 
   bool getTransform(const std::string& refFrame, const std::string& childFrame, tf::StampedTransform& transform)
@@ -204,7 +209,15 @@ public:
 
         // publish marker array
         if (marker_msg_->markers.size() > 0)
+        {
+          empty_published_ = false;
           marker_pub_.publish(marker_msg_);
+        }
+        if(!empty_published_) 
+        {
+          marker_pub_.publish(marker_msg_);
+          empty_published_ = true;
+        }
       }
 
       if (publishMarkersList)
