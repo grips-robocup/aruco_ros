@@ -78,6 +78,8 @@ private:
   bool useCamInfo_;
   std_msgs::UInt32MultiArray marker_list_msg_;
 
+  bool published_empty;
+
 public:
   ArucoMarkerPublisher() :
       nh_("~"), it_(nh_), useCamInfo_(true)
@@ -111,6 +113,8 @@ public:
     marker_msg_ = aruco_msgs::MarkerArray::Ptr(new aruco_msgs::MarkerArray());
     marker_msg_->header.frame_id = reference_frame_;
     marker_msg_->header.seq = 0;
+
+    published_empty = false;
   }
 
   bool getTransform(const std::string& refFrame, const std::string& childFrame, tf::StampedTransform& transform)
@@ -204,7 +208,18 @@ public:
 
         // publish marker array
         if (marker_msg_->markers.size() > 0)
-          marker_pub_.publish(marker_msg_);
+        {
+            published_empty = false;
+            marker_pub_.publish(marker_msg_);
+        }
+        else if(!published_empty)
+        {
+            marker_pub_.publish(marker_msg_);
+            published_empty = true;
+        }
+
+
+        
       }
 
       if (publishMarkersList)
