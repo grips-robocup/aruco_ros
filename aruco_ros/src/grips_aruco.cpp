@@ -206,10 +206,12 @@ public:
           //quickfix for aachen - fix wobbeling
           tf::Quaternion quat = transform.getRotation();
           double roll, pitch, yaw;
-          tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
-          tf::Quaternion new_quat;
-          new_quat.setRPY(3.1415f, 0.f, yaw);
+          tf::Matrix3x3(quat).getRPY(pitch, yaw, roll);
           
+          ROS_INFO_STREAM("Roll: " << roll << " Pitch: " << pitch << " Yaw: " << yaw);
+
+          tf::Quaternion new_quat;
+          new_quat.setRPY(3.1415f, yaw, 0.0f);
           transform.setRotation(new_quat);
 
           if (reference_frame != camera_frame)
@@ -310,7 +312,7 @@ public:
   void cam_info_callback(const sensor_msgs::CameraInfo &msg)
   {
     camParam = aruco_ros::rosCameraInfo2ArucoCamParams(msg, useRectifiedImages);
-
+    
     // handle cartesian offset between stereo pairs
     // see the sensor_msgs/CameraInfo documentation for details
     rightToLeft.setIdentity();
