@@ -123,7 +123,6 @@ public:
     cam_info_sub = nh.subscribe("/camera_info", 1, &ArucoSimple::cam_info_callback, this);
 
     image_pub = it.advertise("result", 1);
-    debug_pub = it.advertise("debug", 1);
     pose_pub = nh.advertise<geometry_msgs::PoseStamped>("pose", 100);
     transform_pub = nh.advertise<geometry_msgs::TransformStamped>("transform", 100);
     position_pub = nh.advertise<geometry_msgs::Vector3Stamped>("position", 100);
@@ -288,16 +287,6 @@ public:
           out_msg.encoding = sensor_msgs::image_encodings::RGB8;
           out_msg.image = inImage;
           image_pub.publish(out_msg.toImageMsg());
-        }
-
-        if (debug_pub.getNumSubscribers() > 0)
-        {
-          // show also the internal image resulting from the threshold operation
-          cv_bridge::CvImage debug_msg;
-          debug_msg.header.stamp = curr_stamp;
-          debug_msg.encoding = sensor_msgs::image_encodings::MONO8;
-          debug_msg.image = mDetector.getThresholdedImage();
-          debug_pub.publish(debug_msg.toImageMsg());
         }
       }
       catch (cv_bridge::Exception& e)
