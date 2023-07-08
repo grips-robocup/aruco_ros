@@ -150,7 +150,7 @@ public:
     bool publishMarkers = marker_pub_.getNumSubscribers() > 0;
     bool publishMarkersList = marker_list_pub_.getNumSubscribers() > 0;
     bool publishImage = image_pub_.getNumSubscribers() > 0;
-    bool publishDebug = debug_pub_.getNumSubscribers() > 0;
+    bool publishDebug = false;
 
     if (!publishMarkers && !publishMarkersList && !publishImage && !publishDebug)
       return;
