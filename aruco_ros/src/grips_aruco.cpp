@@ -250,7 +250,8 @@ public:
         // for each marker, draw info and its boundaries in the image
         for (std::size_t i = 0; i < markers.size(); ++i) {
           // only publishing the selected marker
-          if (markers[i].id == marker_id) {
+          //if (markers[i].id == marker_id) {
+          if (true) {
             tf2::Transform transform = aruco_ros::arucoMarker2Tf2(markers[i]);
             tf2::Stamped<tf2::Transform> cameraToReference;
             cameraToReference.setIdentity();

@@ -44,32 +44,46 @@ target_include_directories(aruco_ros_utils
 ament_target_dependencies(aruco_ros_utils ${THIS_PACKAGE_INCLUDE_DEPENDS})
 target_link_libraries(aruco_ros_utils ${OpenCV_LIBRARIES})
 
-add_executable(single src/simple_single.cpp
-                      src/aruco_ros_utils.cpp)
+# add_executable(single src/simple_single.cpp
+#                       src/aruco_ros_utils.cpp)
 
-target_include_directories(single
+# target_include_directories(single
+#   PUBLIC
+#   include)
+
+# target_include_directories(single
+#   SYSTEM PUBLIC
+#   ${OpenCV_INCLUDE_DIRS}
+# )
+# ament_target_dependencies(single ${THIS_PACKAGE_INCLUDE_DEPENDS})
+# target_link_libraries(single ${OpenCV_LIBRARIES})
+
+# add_executable(double src/simple_double.cpp
+#                       src/aruco_ros_utils.cpp)
+# target_include_directories(double
+#   PUBLIC
+#   include)
+
+# target_include_directories(double
+#   SYSTEM PUBLIC
+#   ${OpenCV_INCLUDE_DIRS}
+# )
+# ament_target_dependencies(double ${THIS_PACKAGE_INCLUDE_DEPENDS})
+# target_link_libraries(double ${OpenCV_LIBRARIES})
+
+# Add grips executable
+add_executable(grips_aruco src/grips_aruco.cpp
+                      src/aruco_ros_utils.cpp)
+target_include_directories(grips_aruco
   PUBLIC
   include)
 
-target_include_directories(single
+target_include_directories(grips_aruco
   SYSTEM PUBLIC
   ${OpenCV_INCLUDE_DIRS}
 )
-ament_target_dependencies(single ${THIS_PACKAGE_INCLUDE_DEPENDS})
-target_link_libraries(single ${OpenCV_LIBRARIES})
-
-add_executable(double src/simple_double.cpp
-                      src/aruco_ros_utils.cpp)
-target_include_directories(double
-  PUBLIC
-  include)
-
-target_include_directories(double
-  SYSTEM PUBLIC
-  ${OpenCV_INCLUDE_DIRS}
-)
-ament_target_dependencies(double ${THIS_PACKAGE_INCLUDE_DEPENDS})
-target_link_libraries(double ${OpenCV_LIBRARIES})
+ament_target_dependencies(grips_aruco ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_link_libraries(grips_aruco ${OpenCV_LIBRARIES})
 
 add_executable(marker_publisher src/marker_publish.cpp
                                 src/aruco_ros_utils.cpp)
@@ -102,7 +116,7 @@ install(TARGETS aruco_ros_utils
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-install(TARGETS marker_publisher single double
+install(TARGETS marker_publisher grips_aruco #single double
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY include/
