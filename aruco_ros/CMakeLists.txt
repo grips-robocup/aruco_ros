@@ -85,18 +85,18 @@ target_include_directories(grips_aruco
 ament_target_dependencies(grips_aruco ${THIS_PACKAGE_INCLUDE_DEPENDS})
 target_link_libraries(grips_aruco ${OpenCV_LIBRARIES})
 
-add_executable(marker_publisher src/marker_publish.cpp
+add_executable(grips_marker_publisher src/grips_marker_publish.cpp
                                 src/aruco_ros_utils.cpp)
-target_include_directories(marker_publisher
+target_include_directories(grips_marker_publisher
   PUBLIC
   include)
 
-target_include_directories(marker_publisher
+target_include_directories(grips_marker_publisher
   SYSTEM PUBLIC
   ${OpenCV_INCLUDE_DIRS}
 )
-ament_target_dependencies(marker_publisher ${THIS_PACKAGE_INCLUDE_DEPENDS})
-target_link_libraries(marker_publisher ${OpenCV_LIBRARIES})
+ament_target_dependencies(grips_marker_publisher ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_link_libraries(grips_marker_publisher ${OpenCV_LIBRARIES})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -116,7 +116,7 @@ install(TARGETS aruco_ros_utils
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-install(TARGETS marker_publisher grips_aruco #single double
+install(TARGETS grips_marker_publisher grips_aruco #single double
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY include/

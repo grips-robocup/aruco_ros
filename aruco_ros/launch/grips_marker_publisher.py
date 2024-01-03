@@ -25,7 +25,7 @@ def launch_setup(context, *args, **kwargs):
 
     aruco_marker_publisher = Node(
         package='aruco_ros',
-        executable='marker_publisher',
+        executable='grips_marker_publisher',
         parameters=[aruco_marker_publisher_params],
         remappings=[('/camera_info', '/ar_cam/camera_info'),
                     ('/image', '/ar_cam/image_rect_color')],
