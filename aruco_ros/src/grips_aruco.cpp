@@ -133,7 +133,7 @@ public:
     this->declare_parameter<bool>("image_is_rectified", true);
     this->declare_parameter<float>("min_marker_size", 0.02);
     this->declare_parameter<std::string>("detection_mode", "");
-    this->declare_parameter("image_transport", "raw");
+    this->declare_parameter("image_transport", "compressed");
 
     float min_marker_size;  // percentage of image area
     this->get_parameter_or<float>("min_marker_size", min_marker_size, 0.02);

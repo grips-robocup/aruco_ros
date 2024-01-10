@@ -18,7 +18,7 @@ def launch_setup(context, *args, **kwargs):
 
     aruco_marker_publisher_params = {
         'image_is_rectified': True,
-        'marker_size': '0.13',
+        'marker_size': 0.13,
         'reference_frame': '/base_link',
         'camera_frame': '/ar_cam_optical_frame',
     }
@@ -27,7 +27,7 @@ def launch_setup(context, *args, **kwargs):
         package='aruco_ros',
         executable='grips_marker_publisher',
         parameters=[aruco_marker_publisher_params],
-        remappings=[('/image', '/image_raw')],
+        remappings=[('/image/compressed', '/image_raw/compressed')],
     )
 
     return [aruco_marker_publisher]
