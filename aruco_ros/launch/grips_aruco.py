@@ -33,8 +33,7 @@ def launch_setup(context, *args, **kwargs):
         package='aruco_ros',
         executable='grips_aruco',
         parameters=[grips_aruco_params],
-        remappings=[('/camera_info', '/ar_cam/camera_info'),
-                    ('/image', '/ar_cam/image_rect_color')],
+        remappings=[('/image', '/image_raw')],
     )
 
     return [grips_aruco]

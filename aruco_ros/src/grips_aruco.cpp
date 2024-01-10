@@ -133,6 +133,7 @@ public:
     this->declare_parameter<bool>("image_is_rectified", true);
     this->declare_parameter<float>("min_marker_size", 0.02);
     this->declare_parameter<std::string>("detection_mode", "");
+    this->declare_parameter("image_transport", "raw");
 
     float min_marker_size;  // percentage of image area
     this->get_parameter_or<float>("min_marker_size", min_marker_size, 0.02);
@@ -151,7 +152,7 @@ public:
     RCLCPP_INFO_STREAM(
       this->get_logger(), "Marker size min: " << min_marker_size << " of image area");
     RCLCPP_INFO_STREAM(this->get_logger(), "Detection mode: " << detection_mode);
-
+    
     image_sub = it_->subscribe("/image", 1, &ArucoSimple::image_callback, this);
     cam_info_sub = this->create_subscription<sensor_msgs::msg::CameraInfo>(
       "/camera_info", 1, std::bind(

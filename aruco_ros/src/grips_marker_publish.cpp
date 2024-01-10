@@ -102,6 +102,7 @@ public:
     this->declare_parameter<std::string>("camera_frame", "");
     this->declare_parameter<bool>("image_is_rectified", true);
     this->declare_parameter<bool>("use_camera_info", true);
+    this->declare_parameter("image_transport", "raw");
 
     tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);

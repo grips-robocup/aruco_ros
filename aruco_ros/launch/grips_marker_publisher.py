@@ -27,8 +27,7 @@ def launch_setup(context, *args, **kwargs):
         package='aruco_ros',
         executable='grips_marker_publisher',
         parameters=[aruco_marker_publisher_params],
-        remappings=[('/camera_info', '/ar_cam/camera_info'),
-                    ('/image', '/ar_cam/image_rect_color')],
+        remappings=[('/image', '/image_raw')],
     )
 
     return [aruco_marker_publisher]
