@@ -23,9 +23,9 @@ def launch_setup(context, *args, **kwargs):
         'image_is_rectified': True,
         'marker_size': 0.13,
         'marker_id': 69,
-        'reference_frame': '/base_link',
-        'camera_frame': '/ar_cam_optical_frame',
-        'marker_frame': '/ar_marker',
+        'reference_frame': 'base_link',
+        'camera_frame': 'ar_cam_optical_frame',
+        'marker_frame': 'ar_marker',
         'corner_refinement': 'LINES',
     }
 

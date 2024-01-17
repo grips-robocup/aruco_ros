@@ -19,8 +19,8 @@ def launch_setup(context, *args, **kwargs):
     aruco_marker_publisher_params = {
         'image_is_rectified': True,
         'marker_size': 0.13,
-        'reference_frame': '/base_link',
-        'camera_frame': '/ar_cam_optical_frame',
+        'reference_frame': 'base_link',
+        'camera_frame': 'ar_cam_optical_frame',
     }
 
     aruco_marker_publisher = Node(
