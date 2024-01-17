@@ -267,10 +267,12 @@ public:
               static_cast<tf2::Transform>(rightToLeft) *
               transform;
 
+            std::string grips_marker_frame = marker_frame + "_" + std::to_string(markers[i].id);
+
             geometry_msgs::msg::TransformStamped stampedTransform;
             stampedTransform.header.frame_id = reference_frame;
             stampedTransform.header.stamp = curr_stamp;
-            stampedTransform.child_frame_id = marker_frame;
+            stampedTransform.child_frame_id = grips_marker_frame;
             tf2::toMsg(transform, stampedTransform.transform);
             tf_broadcaster_->sendTransform(stampedTransform);
             geometry_msgs::msg::PoseStamped poseMsg;
