@@ -89,7 +89,7 @@ private:
 
 public:
   ArucoMarkerPublisher()
-  : Node("marker_publisher"), useCamInfo_(true)
+  : Node("aruco_marker_publisher"), useCamInfo_(true)
   {
   }
 
