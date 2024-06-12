@@ -45,6 +45,8 @@
 #include <aruco_msgs/MarkerArray.h>
 #include <tf/transform_listener.h>
 #include <std_msgs/UInt32MultiArray.h>
+#include <tf/transform_broadcaster.h>
+
 
 class ArucoMarkerPublisher
 {
@@ -53,6 +55,8 @@ private:
   aruco::MarkerDetector mDetector_;
   aruco::CameraParameters camParam_;
   std::vector<aruco::Marker> markers_;
+  std::string tf_prefix;
+  std::string marker_frame;
 
   // node params
   bool useRectifiedImages_;
@@ -96,7 +100,9 @@ public:
       nh_.param<bool>("image_is_rectified", useRectifiedImages_, true);
       nh_.param<std::string>("reference_frame", reference_frame_, "");
       nh_.param<std::string>("camera_frame", camera_frame_, "");
+      nh_.param<std::string>("marker_frame", marker_frame, "");
       camParam_ = aruco_ros::rosCameraInfo2ArucoCamParams(*msg, useRectifiedImages_);
+      nh_.param<std::string>("tf_prefix", tf_prefix, "");
       ROS_ASSERT(not (camera_frame_.empty() and not reference_frame_.empty()));
       if (reference_frame_.empty())
         reference_frame_ = camera_frame_;
@@ -147,6 +153,7 @@ public:
 
   void image_callback(const sensor_msgs::ImageConstPtr& msg)
   {
+    static tf::TransformBroadcaster br;    
     bool publishMarkers = marker_pub_.getNumSubscribers() > 0;
     bool publishMarkersList = marker_list_pub_.getNumSubscribers() > 0;
     bool publishImage = image_pub_.getNumSubscribers() > 0;
@@ -182,6 +189,33 @@ public:
           marker_i.header.stamp = curr_stamp;
           marker_i.id = markers_.at(i).id;
           marker_i.confidence = 1.0;
+
+          tf::Transform transform = aruco_ros::arucoMarker2Tf(markers_.at(i));
+          tf::StampedTransform cameraToReference;
+          cameraToReference.setIdentity();
+
+          //quickfix for aachen - fix wobbeling
+          tf::Quaternion quat = transform.getRotation();
+          double roll, pitch, yaw;
+          tf::Matrix3x3(quat).getRPY(pitch, yaw, roll);
+          
+          ROS_INFO_STREAM("Roll: " << roll << " Pitch: " << pitch << " Yaw: " << yaw);
+
+          tf::Quaternion new_quat;
+          new_quat.setRPY(3.1415f, yaw, 0.0f);
+          transform.setRotation(new_quat);
+
+          if (reference_frame_ != camera_frame_)
+          {
+            getTransform(reference_frame_, camera_frame_, cameraToReference);
+          }
+
+          transform = static_cast<tf::Transform>(cameraToReference) * transform;
+
+          std::string grips_marker_frame = tf_prefix + marker_frame + "_" + std::to_string(markers_.at(i).id);
+          tf::StampedTransform stampedTransform(transform, curr_stamp, reference_frame_, grips_marker_frame);
+            
+          br.sendTransform(stampedTransform);
         }
 
         // if there is camera info let's do 3D stuff
