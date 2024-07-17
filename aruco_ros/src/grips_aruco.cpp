@@ -234,7 +234,7 @@ public:
       (pixel_pub->get_subscription_count() == 0))
     {
       RCLCPP_DEBUG(this->get_logger(), "No subscribers, not looking for ArUco markers");
-      return;
+      //return;
     }
 
     if (cam_info_received) {
